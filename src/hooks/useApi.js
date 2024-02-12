@@ -2,12 +2,17 @@ import axios from 'axios';
 import { baseURL } from 'src/Constants/Constants';
 
 // Create a new Axios instance
-const axiosInstance = axios.create({
-  baseURL:baseURL
+const api = axios.create({
+  baseURL:baseURL,
+  headers:{
+    'Content-Type': 'application/json',
+     accept: 'application/json',
+     tenant: 'root'
+  }
 });
 
 // Add a request interceptor to add the access token to headers
-axiosInstance.interceptors.request.use(
+api.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken) {
@@ -21,51 +26,70 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Add a response interceptor to handle token refreshing
-// axiosInstance.interceptors.response.use(
-//   (response) => {
-//     return response;
-//   },
-//   async (error) => {
-//     const originalRequest = error.config;
-//     if (error.response.status === 401 && !originalRequest._retry) {
-//       originalRequest._retry = true;
-//       const refreshToken = localStorage.getItem('refreshToken');
-//       if (refreshToken) {
-//         try {
-//           const response = await axios.post('/api/refresh-token', {
-//             refreshToken: refreshToken
-//           });
-//           const newAccessToken = response.data.accessToken;
-//           localStorage.setItem('accessToken', newAccessToken);
 
-//           // Retry the original request with the new access token
-//           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-//           return axiosInstance(originalRequest);
+// ! response interceptor
 
-//         } catch (refreshError) {
-//           // Refresh token expired or invalid
-//           console.error('Error refreshing token:', refreshError);
+api.interceptors.response.use(
+  response => {
+    // Do something with successful responses
+    return response;
+  },
+  async error => {
+    // Handle errors
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      if (error.response.status === 401) {
+        // Unauthorized access
+        const accessToken = localStorage.getItem('accessToken');
+        const refreshToken = localStorage.getItem('refreshToken');
 
-//           // Redirect user to login page
-//           // Replace the following line with your own code to redirect
-//           window.location.href = '/login';
+        if (!accessToken || !refreshToken) {
+          // Redirect to login URL if tokens are not available
+          localStorage.clear();
+          window.location.href = '/login';
 
-//           return Promise.reject(refreshError);
-//         }
-//       } else {
-//         // Refresh token not found, redirect user to login page
-//         // Replace the following line with your own code to redirect
+          return Promise.reject(error);
+        }
 
-//         window.location.href = '/login';
+        try {
+          // Attempt to refresh tokens
+          const response = await axios.post(`${baseURL + '/tokens/token.getrefreshtokenasync'}`, {
+            refreshToken: refreshToken, token: accessToken
+          } , {
+            headers: {
+                'Content-Type': 'application/json',
+                accept: 'application/json',
+                tenant: 'root'
+              }
+          });
+          const newAccessToken = response.data.data.token;
+          const newRefreshToken = response.data.data.refreshToken;
 
-//         return Promise.reject(error);
-//       }
-//     }
+          localStorage.setItem('accessToken', newAccessToken);
+          localStorage.setItem('refreshToken', newRefreshToken);
 
-//     return Promise.reject(error);
-//   }
-// );
+          // Retry original request with new access token
+          error.config.headers.Authorization = `Bearer ${newAccessToken}`;
 
-export default axiosInstance;
+          return api.request(error.config);
+        } catch (refreshError) {
+          // Clear tokens and redirect to login URL if refresh token fails
+          localStorage.clear()
+          window.location.href = '/login';
+
+          return Promise.reject(refreshError);
+        }
+      } else {
+        // Let other errors be handled by the page
+        return Promise.reject(error);
+      }
+    } else {
+      // Let other errors be handled by the page
+      return Promise.reject(error);
+    }
+  }
+);
+
+export default api;

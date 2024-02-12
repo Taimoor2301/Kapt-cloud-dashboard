@@ -1,4 +1,3 @@
-
 // ** MUI Imports
 import Drawer from '@mui/material/Drawer'
 import Button from '@mui/material/Button'
@@ -17,7 +16,10 @@ import { useForm, Controller } from 'react-hook-form'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
+import api from 'src/hooks/useApi'
+import toast from 'react-hot-toast'
 
 const showErrors = (field, valueLen, min) => {
   if (valueLen === 0) {
@@ -48,13 +50,32 @@ const schema = yup.object().shape({
 })
 
 const defaultValues = {
- roleName:"",
- roleDescription:""
+  roleName: '',
+  roleDescription: ''
 }
 
-const SidebarAddUser = props => {
-  // ** Props
-  const { open, toggle } = props
+const AddRoleDrawer = ({ open, toggle }) => {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    mutationKey: ['addNewRole'],
+    mutationFn: data => api.post('/roles/roles.createroleasync', data),
+    onSuccess: data => {
+      queryClient.invalidateQueries(['roles'])
+      reset()
+      toggle()
+      toast.success('Role added')
+    },
+    onError: errors => {
+      toggle()
+      toast.error(errors.response.data.messages[0] || 'Something went wrong')
+    },
+    retry: 0
+  })
+
+  // if (mutation.error) {
+  //   console.log(mutation.error)
+  // }
 
   const {
     reset,
@@ -68,13 +89,7 @@ const SidebarAddUser = props => {
   })
 
   const onSubmit = data => {
-    if (data) {
-      console.log(data)
-        }
-     else {
-      toggle()
-      reset()
-    }
+    mutation.mutate({ name: data.roleName, description: data.roleDescription })
   }
 
   const handleClose = () => {
@@ -147,10 +162,9 @@ const SidebarAddUser = props => {
             )}
           />
 
-
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button type='submit' variant='contained' sx={{ mr: 3 }}>
-              Submit
+              {mutation.isPending ? 'Loading...' : 'Submit'}
             </Button>
             <Button variant='tonal' color='secondary' onClick={handleClose}>
               Cancel
@@ -162,4 +176,4 @@ const SidebarAddUser = props => {
   )
 }
 
-export default SidebarAddUser
+export default AddRoleDrawer

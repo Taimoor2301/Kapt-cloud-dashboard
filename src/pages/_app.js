@@ -84,7 +84,13 @@ const Guard = ({ children, authGuard, guestGuard }) => {
 
 // * React Query
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions:{
+    queries:{
+      staleTime: 60 * 1000,
+    }
+  }
+});
 
 // ** Configure JSS & ClassName
 const App = props => {

@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 
 // ** Axios
 import axios from 'axios'
+import api from 'src/hooks/useApi'
 
 // ** Config
 import authConfig from 'src/configs/auth'
@@ -39,32 +40,16 @@ const AuthProvider = ({ children }) => {
       const storedToken = window.localStorage.getItem('accessToken')
       if (storedToken) {
         setLoading(true)
-
-        // await axios
-        //   .get(authConfig.meEndpoint, {
-        //     headers: {
-        //       Authorization: storedToken
-        //     }
-        //   })
-        //   .then(async response => {
-        //     setLoading(false)
-        //     setUser({ ...response.data.userData })
-        //   })
-        //   .catch(() => {
-        //     localStorage.removeItem('userData')
-        //     localStorage.removeItem('refreshToken')
-        //     localStorage.removeItem('accessToken')
-        //     setUser(null)
-        //     setLoading(false)
-        //     if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
-        //       router.replace('/login')
-        //     }
-        //   })
         try {
-          setUser(JSON.parse(localStorage.getItem('userData')));
+          // const res = await api.get(`/users/users.getuserdetailsbyidasync`, { params: { id:JSON.parse(localStorage.getItem('userData')).id } });
+          const res = await api.get(`/personal/personal.getcurrentuserdetailasync`);
+
+          // console.log(res2.data,'from res 2')
+          // console.log(res.data,'from res 1')
+          setUser({...res.data, role:'admin'});
           setUserPermissions(JSON.parse(localStorage.getItem('userPermissions')));
           setUserRoles(JSON.parse(localStorage.getItem('userRoles')));
-          router.replace('/dashboards')
+
          } catch (error){
             if(error.response?.status === 401){
               localStorage.removeItem('accessToken');
@@ -72,7 +57,8 @@ const AuthProvider = ({ children }) => {
               router.replace('/login');
             } else{
               console.log(error)
-              toast.error('Something went wrong')
+              toast.error('Something went wrong');
+              router.replace('/login');
             }
          } finally{
           setLoading(false)
@@ -116,22 +102,6 @@ const AuthProvider = ({ children }) => {
         toast.error('Something went wrong')
       }
     }
-
-
-
-      // .then(async response => {
-      //   params.rememberMe
-      //     ? window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.accessToken)
-      //     : null
-      //   const returnUrl = router.query.returnUrl
-      //   setUser({ ...response.data.userData })
-      //   params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(response.data.userData)) : null
-      //   const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
-      //   router.replace(redirectURL)
-      // })
-      // .catch(err => {
-      //   if (errorCallback) errorCallback(err)
-      // })
   }
 
   const handleLogout = () => {

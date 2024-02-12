@@ -26,7 +26,7 @@ const TableHeader = props => {
         justifyContent: 'space-between'
       }}
     >
-    <Typography sx={{fontSize:'1.125rem' , fontWeight:"500"}}>Roles List</Typography>
+      <Typography sx={{ fontSize: '1.125rem', fontWeight: '500' }}>Roles List</Typography>
 
       <Box sx={{ rowGap: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <CustomTextField

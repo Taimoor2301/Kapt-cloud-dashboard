@@ -44,7 +44,7 @@ const Error404 = () => {
           <Typography sx={{ mb: 6, color: 'text.secondary' }}>
             Oops! 😖 The requested URL was not found on this server.
           </Typography>
-          <Button href='/' component={Link} variant='contained'>
+          <Button href='/dashboards' component={Link} variant='contained'>
             Back to Home
           </Button>
         </BoxWrapper>
