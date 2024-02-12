@@ -25,22 +25,30 @@ const Header = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between'
 }))
 
-const AddRoleDrawer = ({ open, toggle, itemToEdit }) => {
+const dataTemplate = {
+  firstName: '',
+  lastName: '',
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: ''
+}
+
+const AddRoleDrawer = ({ open, toggle, data }) => {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationKey: ['editRole'],
-    mutationFn: data => {
-      api.post('/roles/roles.createroleasync', data)
-    },
-    onSuccess: () => {
+    mutationKey: ['addNewRole'],
+    mutationFn: data => api.post('/roles/roles.createroleasync', data),
+    onSuccess: data => {
       queryClient.invalidateQueries(['roles'])
+      reset()
       toggle()
     },
     onError: errors => {
-      // toggle()
+      toggle()
+      toast.error(JSON.parse(errors.response.data).messages[0] || 'Something went wrong')
       console.log(errors)
-      toast.error(errors.response.data.messages[0] || 'Something went wrong')
     }
   })
 
@@ -48,21 +56,16 @@ const AddRoleDrawer = ({ open, toggle, itemToEdit }) => {
   const [description, setDescription] = useState('')
   const [isActive, setIsActive] = useState(false)
 
-  useEffect(() => {
-    if (itemToEdit) {
-      setName(itemToEdit.name)
-      setDescription(itemToEdit.description)
-      setIsActive(itemToEdit.isActive)
-    }
-  }, [itemToEdit])
+  // useEffect(() => {
+  //   if (itemToEdit) {
+  //     setName(itemToEdit.name)
+  //     setDescription(itemToEdit.description)
+  //     setIsActive(itemToEdit.isActive)
+  //   }
+  // }, [itemToEdit])
 
-  const onSubmit = () => {
-    mutation.mutate({
-      id: itemToEdit.id,
-      name,
-      description,
-      isActive
-    })
+  const onSubmit = data => {
+    // mutation.mutate({ name: data.roleName, description: data.roleDescription })
   }
 
   return (
@@ -95,7 +98,7 @@ const AddRoleDrawer = ({ open, toggle, itemToEdit }) => {
 
       <Box sx={{ p: theme => theme.spacing(0, 6, 6) }}>
         <Box sx={{ my: 4 }}>
-          <FormControl fullWidth required>
+          <FormControl fullWidth>
             <CustomTextField
               fullWidth
               label='Role Name'
@@ -107,7 +110,7 @@ const AddRoleDrawer = ({ open, toggle, itemToEdit }) => {
         </Box>
 
         <Box sx={{ my: 4 }}>
-          <FormControl fullWidth required>
+          <FormControl fullWidth>
             <CustomTextField
               fullWidth
               label='Role Description'
@@ -137,13 +140,7 @@ const AddRoleDrawer = ({ open, toggle, itemToEdit }) => {
         </Grid>
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Button
-            type='submit'
-            onClick={onSubmit}
-            disabled={description?.length < 3 || name?.length < 3 || !itemToEdit?.id || mutation.isPending}
-            variant='contained'
-            sx={{ mr: 3 }}
-          >
+          <Button type='submit' variant='contained' sx={{ mr: 3 }}>
             {mutation.isPending ? 'Loading...' : 'Submit'}
           </Button>
           <Button variant='tonal' color='secondary' onClick={toggle}>

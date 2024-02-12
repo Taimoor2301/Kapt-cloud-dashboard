@@ -26,19 +26,19 @@ const TableHeader = props => {
         justifyContent: 'space-between'
       }}
     >
-      <Typography sx={{ fontSize: '1.125rem', fontWeight: '500' }}>Roles List</Typography>
+      <Typography sx={{ fontSize: '1.125rem', fontWeight: '500' }}>Users List</Typography>
 
       <Box sx={{ rowGap: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <CustomTextField
           value={value}
           sx={{ mr: 4 }}
-          placeholder='Search Roles'
+          placeholder='Search User'
           onChange={e => handleFilter(e.target.value)}
         />
 
         <Button onClick={toggle} variant='contained' sx={{ '& svg': { mr: 2 } }}>
           <Icon fontSize='1.125rem' icon='tabler:plus' />
-          Add New Role
+          Add New User
         </Button>
       </Box>
     </Box>
