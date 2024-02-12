@@ -14,8 +14,9 @@ import { fetchData } from "src/store/apps/user";
 import axios from "axios";
 
 // ** Custom Table Components Imports
-import TableHeader from "src/views/apps/user/list/TableHeader";
-import AddUserDrawer from "src/views/apps/user/list/AddUserDrawer";
+import RoutesAccordion from "./components/RoutesAccordion";
+import AddRouteDrawer from "./components/AddRouteDrawer";
+import TableHeader from "./components/TableHeader";
 
 const Routes = () => {
   // ** State
@@ -64,7 +65,8 @@ const Routes = () => {
             className="m-5"
           >
             <CardContent sx={{ margin: 0 }}>
-              <Typography sx={{ fontSize: "16px" }}>{"Route"}</Typography>
+              <Typography sx={{ fontSize: "16px", marginBottom:"30px" }}  >{"Route"} Total (12)</Typography>
+              <RoutesAccordion/>
              
             </CardContent>
           </Card>
@@ -73,7 +75,7 @@ const Routes = () => {
         </Card>
       </Grid>
 
-      <AddUserDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
+      <AddRouteDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
     </Grid>
   );
 };
