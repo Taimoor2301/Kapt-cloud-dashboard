@@ -113,7 +113,7 @@ const SidebarAddUser = props => {
       <Box sx={{ p: theme => theme.spacing(0, 6, 6) }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
-            name='roleName'
+            name='fullName'
             control={control}
             rules={{ required: true }}
             render={({ field: { value, onChange } }) => (
@@ -121,7 +121,7 @@ const SidebarAddUser = props => {
                 fullWidth
                 value={value}
                 sx={{ mb: 4 }}
-                label='Role'
+                label='Full Name'
                 onChange={onChange}
                 placeholder='admin'
                 error={Boolean(errors.roleName)}
@@ -130,7 +130,7 @@ const SidebarAddUser = props => {
             )}
           />
           <Controller
-            name='roleDescription'
+            name='username'
             control={control}
             rules={{ required: true }}
             render={({ field: { value, onChange } }) => (
@@ -138,16 +138,136 @@ const SidebarAddUser = props => {
                 fullWidth
                 value={value}
                 sx={{ mb: 4 }}
-                label='Role Description'
+                label='Username'
                 onChange={onChange}
-                placeholder='description'
-                error={Boolean(errors.roleDescription)}
-                {...(errors.roleDescription && { helperText: errors.roleDescription.message })}
+                placeholder='johndoe'
+                error={Boolean(errors.username)}
+                {...(errors.username && { helperText: errors.username.message })}
               />
             )}
           />
+          <Controller
+            name='email'
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <CustomTextField
+                fullWidth
+                type='email'
+                label='Email'
+                value={value}
+                sx={{ mb: 4 }}
+                onChange={onChange}
+                error={Boolean(errors.email)}
+                placeholder='johndoe@email.com'
+                {...(errors.email && { helperText: errors.email.message })}
+              />
+            )}
+          />
+          <Controller
+            name='company'
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <CustomTextField
+                fullWidth
+                value={value}
+                sx={{ mb: 4 }}
+                label='Company'
+                onChange={onChange}
+                placeholder='Company PVT LTD'
+                error={Boolean(errors.company)}
+                {...(errors.company && { helperText: errors.company.message })}
+              />
+            )}
+          />
+          <Controller
+            name='country'
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <CustomTextField
+                fullWidth
+                value={value}
+                sx={{ mb: 4 }}
+                label='Country'
+                onChange={onChange}
+                placeholder='Australia'
+                error={Boolean(errors.country)}
+                {...(errors.country && { helperText: errors.country.message })}
+              />
+            )}
+          />
+          <Controller
+            name='contact'
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <CustomTextField
+                fullWidth
+                type='number'
+                value={value}
+                sx={{ mb: 4 }}
+                label='Contact'
+                onChange={onChange}
+                placeholder='(397) 294-5153'
+                error={Boolean(errors.contact)}
+                {...(errors.contact && { helperText: errors.contact.message })}
+              />
+            )}
+          />
+          <Controller
+            name='billing'
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <CustomTextField
+                select
+                fullWidth
+                sx={{ mb: 4 }}
+                label='Billing'
+                id='validation-billing-select'
+                error={Boolean(errors.billing)}
+                aria-describedby='validation-billing-select'
+                {...(errors.billing && { helperText: errors.billing.message })}
+                SelectProps={{ value: value, onChange: e => onChange(e) }}
+              >
+                <MenuItem value=''>Billing</MenuItem>
+                <MenuItem value='Auto Debit'>Auto Debit</MenuItem>
+                <MenuItem value='Manual - Cash'>Manual - Cash</MenuItem>
+                <MenuItem value='Manual - Paypal'>Manual - Paypal</MenuItem>
+                <MenuItem value='Manual - Credit Card'>Manual - Credit Card</MenuItem>
+              </CustomTextField>
+            )}
+          />
+          <CustomTextField
+            select
+            fullWidth
+            value={role}
+            sx={{ mb: 4 }}
+            label='Select Role'
+            onChange={e => setRole(e.target.value)}
+            SelectProps={{ value: role, onChange: e => setRole(e.target.value) }}
+          >
+            <MenuItem value='admin'>Admin</MenuItem>
+            <MenuItem value='author'>Author</MenuItem>
+            <MenuItem value='editor'>Editor</MenuItem>
+            <MenuItem value='maintainer'>Maintainer</MenuItem>
+            <MenuItem value='subscriber'>Subscriber</MenuItem>
+          </CustomTextField>
 
-
+          <CustomTextField
+            select
+            fullWidth
+            sx={{ mb: 6 }}
+            label='Select Plan'
+            SelectProps={{ value: plan, onChange: e => setPlan(e.target.value) }}
+          >
+            <MenuItem value='basic'>Basic</MenuItem>
+            <MenuItem value='company'>Company</MenuItem>
+            <MenuItem value='enterprise'>Enterprise</MenuItem>
+            <MenuItem value='team'>Team</MenuItem>
+          </CustomTextField>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button type='submit' variant='contained' sx={{ mr: 3 }}>
               Submit

@@ -73,10 +73,6 @@ const AddRoleDrawer = ({ open, toggle }) => {
     retry: 0
   })
 
-  // if (mutation.error) {
-  //   console.log(mutation.error)
-  // }
-
   const {
     reset,
     control,
