@@ -1,22 +1,11 @@
-// ** React Imports
 import { useState, useEffect, useCallback } from 'react'
-
-// ** MUI Imports
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
-
-// ** Store Imports
 import { useDispatch } from 'react-redux'
-
-// ** Actions Imports
 import { fetchData } from 'src/store/apps/user'
-
-// ** Third Party Components
 import axios from 'axios'
-
-// ** Custom Table Components Imports
 import RoutesAccordion from './components/RoutesAccordion'
 import AddRouteDrawer from './components/AddRouteDrawer'
 import TableHeader from './components/TableHeader'
