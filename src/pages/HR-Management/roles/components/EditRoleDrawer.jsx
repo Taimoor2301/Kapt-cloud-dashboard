@@ -36,6 +36,7 @@ const AddRoleDrawer = ({ open, toggle, itemToEdit }) => {
     onSuccess: () => {
       queryClient.invalidateQueries(['roles'])
       toggle()
+      toast.success('Success')
     },
     onError: errors => {
       // toggle()

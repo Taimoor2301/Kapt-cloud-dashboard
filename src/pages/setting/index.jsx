@@ -19,9 +19,9 @@ import { SliderPicker } from 'react-color'
 function Setting() {
   const [MobilePhoto, SetMobile] = useState('')
   const [SelectedFile, SetSelectedFile] = useState(null)
-  const [SelectedColor, SetSelectedColor] = useState('#4e83d9') 
+  const [SelectedColor, SetSelectedColor] = useState('#4e83d9')
   const [SelectedLogo, SetSelectedLogo] = useState(null)
-  const [SelectedSecondaryColor, SetSelectedSecondaryColor] = useState('#8ebbe8') 
+  const [SelectedSecondaryColor, SetSelectedSecondaryColor] = useState('#8ebbe8')
 
   useEffect(() => {
     SetSelectedFile(new File([], ''))

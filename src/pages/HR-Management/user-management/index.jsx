@@ -16,6 +16,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import api from 'src/hooks/useApi'
 import { CircularProgress } from '@mui/material'
 import EditUserDrawer from './components/EditUserDrawer'
+import Tooltip from '@mui/material/Tooltip'
 
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
@@ -172,14 +173,15 @@ const columns = [
     field: 'emailConfirmed',
     renderCell: ({ row }) => {
       return (
-        <CustomChip
-          rounded
-          skin='light'
-          size='small'
-          label={row.emailConfirmed ? 'Yes' : 'No'}
-          color={row.emailConfirmed ? 'success' : 'warning'}
-          sx={{ textTransform: 'capitalize' }}
-        />
+        <Typography
+          noWrap
+          sx={{
+            color: row.emailConfirmed ? theme => theme.palette.success.main : theme => theme.palette.error.main,
+            marginLeft: '15px'
+          }}
+        >
+          <Icon icon={row.emailConfirmed ? 'tabler:shield-check' : 'tabler:shield-x'} fontSize={24} />
+        </Typography>
       )
     }
   },
@@ -191,7 +193,14 @@ const columns = [
     renderCell: ({ row }) => {
       return (
         <Typography noWrap sx={{ color: 'text.secondary' }}>
-          {row.roles[0]?.roleName}
+          {row?.roles.map((role, index) => (
+            <Tooltip key={index} title={row?.roles?.map(r => r.roleName).join(', ')}>
+              <span style={{ display: 'inline' }}>
+                {role.roleName}
+                {index < row.roles.length - 1 && ', '}
+              </span>
+            </Tooltip>
+          ))}
         </Typography>
       )
     }

@@ -224,7 +224,7 @@ const Roles = () => {
             <DataGrid
               autoHeight
               rowHeight={62}
-              rows={rolesToShow.map(el => ({
+              rows={rolesToShow?.map(el => ({
                 ...el,
                 editFn: data => {
                   setItemToEdit(data)
