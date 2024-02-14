@@ -32,6 +32,10 @@ export default function Sites() {
   const [editSiteOpen, setEditSiteOpen] = useState(false)
   const [siteToEdit, setSiteToEdit] = useState(null)
 
+  // cities
+  const [flag, setflag] = useState(false)
+  const [selectedCity, setSelectedCity] = useState({})
+
   const { data: routes } = useQuery({
     queryFn: () => api.get('/routes/route.getallrouteasync'),
     queryKey: ['routes']
@@ -75,8 +79,9 @@ export default function Sites() {
     setSitesToSHow(allSites.filter(site => site.route.id === selectedRoute))
   }, [selectedRoute, allSites])
 
-  function handleSiteNameClick(site) {
-    null
+  const handleCityNameClick = city => {
+    setSelectedCity(city)
+    setflag(true)
   }
 
   return (
@@ -114,7 +119,7 @@ export default function Sites() {
                   key={site.id}
                   site={site}
                   setSiteToEdit={setSiteToEdit}
-                  handleCityNameClick={handleSiteNameClick}
+                  handleCityNameClick={handleCityNameClick}
                   toggleEditor={() => setEditSiteOpen(true)}
                 />
               ))}
@@ -125,7 +130,7 @@ export default function Sites() {
 
       <Grid item xs={12} md={8}>
         <Card>
-          {allSites?.length > 0 && <LeafletMapcomponents cities={allSites} selectedCity={allSites[0]} flag={true} />}
+          <LeafletMapcomponents cities={allSites} selectedCity={selectedCity} flag={flag} />
         </Card>
       </Grid>
 

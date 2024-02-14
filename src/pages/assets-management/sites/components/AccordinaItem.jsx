@@ -40,7 +40,6 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
 
 const AccordionItem = ({ site, handleCityNameClick, setSiteToEdit, toggleEditor }) => {
   const queryClient = useQueryClient()
-  const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   // delete

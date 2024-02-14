@@ -9,15 +9,7 @@ const MapMarkersComponent = dynamic(() => import('./MapMarkerComponent'), {
 })
 
 const Map = ({ cities, selectedCity, flag }) => {
-  // const customIcon = new L.Icon({
-  //   iconUrl: `data:image/png;base64,${cities?.route?.markerIcon || ''}`,
-  //   iconSize: [32, 32],
-  //   iconAnchor: [16, 32],
-  //   popupAnchor: [0, -32]
-  // })
-
   const LatLngBounds = L.latLngBounds(cities?.map(city => [city?.lat, city?.lon]))
-
   const mapRef = useRef()
 
   const calculateCenter = () => {
@@ -62,15 +54,11 @@ const Map = ({ cities, selectedCity, flag }) => {
         })
 
         return (
-          <>
-            <Marker key={city.id} position={[city.lat, city.lon]} icon={customIcon}>
-              <Popup>
-                {city.name} <br /> Coordinates: {city.lat}, {city.lon}
-              </Popup>
-            </Marker>
-
-            {/* <Polyline positions={cities.map(city => [city.lat, city.lon])} color={city.route.color} /> */}
-          </>
+          <Marker key={city.id} position={[city.lat, city.lon]} icon={customIcon}>
+            <Popup>
+              {city.name} <br /> Coordinates: {city.lat}, {city.lon}
+            </Popup>
+          </Marker>
         )
       })}
     </MapContainer>

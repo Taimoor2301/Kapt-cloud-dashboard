@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Menu from '@mui/material/Menu'
 import Grid from '@mui/material/Grid'
@@ -8,8 +7,7 @@ import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import { DataGrid } from '@mui/x-data-grid'
 import Icon from 'src/@core/components/icon'
-import CustomAvatar from 'src/@core/components/mui/avatar'
-import { getInitials } from 'src/@core/utils/get-initials'
+
 import TableHeader from './components/TableHeader'
 import AddUserDrawer from './components/AddUserDrawer'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -21,21 +19,9 @@ import Tooltip from '@mui/material/Tooltip'
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
 import toast from 'react-hot-toast'
+import UserModal from './components/UserModal'
 
-const renderClient = row => {
-  if (row.imageUrl) {
-    return <CustomAvatar src={row.imageUrl} sx={{ mr: 2.5, width: 38, height: 38 }} />
-  } else {
-    return (
-      <CustomAvatar
-        skin='light'
-        sx={{ mr: 2.5, width: 38, height: 38, fontWeight: 500, fontSize: theme => theme.typography.body1.fontSize }}
-      >
-        {getInitials(row.firstName ? row.firstName : 'John Doe')}
-      </CustomAvatar>
-    )
-  }
-}
+import EditDrawer from './components/EditDrawer'
 
 const RowOptions = ({ data }) => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -122,31 +108,7 @@ const columns = [
     minWidth: 280,
     field: 'firstName',
     headerName: 'User Name',
-    renderCell: ({ row }) => {
-      const { firstName, lastName, email } = row
-
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {renderClient(row)}
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
-            <Typography
-              noWrap
-              sx={{
-                fontWeight: 500,
-                textDecoration: 'none',
-                color: 'text.secondary',
-                '&:hover': { color: 'primary.main' }
-              }}
-            >
-              {firstName + ' ' + lastName}
-            </Typography>
-            <Typography noWrap variant='body2' sx={{ color: 'text.disabled' }}>
-              {email}
-            </Typography>
-          </Box>
-        </Box>
-      )
-    }
+    renderCell: ({ row }) => <UserModal row={row} />
   },
   {
     flex: 0.15,
@@ -251,41 +213,47 @@ const UserList = ({ apiData }) => {
   return (
     <Grid container spacing={6.5}>
       <Grid item xs={12}>
-        {isLoading ? (
-          <div className='h-full w-full grid place-content-center'>
-            <CircularProgress />
-          </div>
-        ) : isError ? (
-          <Typography>Something went wrong! Please try again.</Typography>
-        ) : (
-          <Card>
-            <TableHeader
-              value={searchValue}
-              handleFilter={val => setSearchValue(val)}
-              toggle={() => setAddUserOpen(p => !p)}
-            />
-            <DataGrid
-              autoHeight
-              rowHeight={62}
-              rows={usersToShow?.map(el => ({
-                ...el,
-                editFn: data => {
-                  setItemToEdit(data)
-                  setOpenEditUser(true)
+        <Card>
+          <TableHeader
+            value={searchValue}
+            handleFilter={val => setSearchValue(val)}
+            toggle={() => setAddUserOpen(p => !p)}
+          />
+
+          {isLoading ? (
+            <div className='h-full w-full grid place-content-center py-5'>
+              <CircularProgress />
+            </div>
+          ) : isError ? (
+            <Typography>Something went wrong! Please try again.</Typography>
+          ) : (
+            allUsers?.length > 0 && (
+              <DataGrid
+                autoHeight
+                rowHeight={62}
+                rows={
+                  usersToShow?.map(el => ({
+                    ...el,
+                    editFn: data => {
+                      setItemToEdit(data)
+                      setOpenEditUser(true)
+                    }
+                  })) || []
                 }
-              }))}
-              columns={columns}
-              disableRowSelectionOnClick
-              pageSizeOptions={[10, 25, 50]}
-              paginationModel={paginationModel}
-              onPaginationModelChange={setPaginationModel}
-            />
-          </Card>
-        )}
+                columns={columns}
+                disableRowSelectionOnClick
+                pageSizeOptions={[10, 25, 50]}
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+              />
+            )
+          )}
+        </Card>
       </Grid>
 
       <AddUserDrawer open={addUserOpen} toggle={() => setAddUserOpen(p => !p)} />
       <EditUserDrawer open={openEditUser} toggle={() => setOpenEditUser(p => !p)} data={itemToEdit} />
+      {/* <EditDrawer open={openEditUser} toggle={() => setOpenEditUser(p => !p)} row={itemToEdit} /> */}
     </Grid>
   )
 }

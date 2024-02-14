@@ -2,13 +2,12 @@ import React, { useState } from 'react'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip'
+import Tooltip from '@mui/material/Tooltip'
 import CircularProgress from '@mui/material/CircularProgress'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import Dialog from '@mui/material/Dialog'
-import AddUserDrawer from './AddUserDrawer'
 import { Button } from '@mui/material'
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
@@ -17,8 +16,12 @@ import TableContainer from '@mui/material/TableContainer'
 import TableCell from '@mui/material/TableCell'
 import TableBody from '@mui/material/TableBody'
 import Table from '@mui/material/Table'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import TableRow from '@mui/material/TableRow'
-import RowOptions from 'src/views/apps/user/userManagement/list/RowOptions'
+import api from 'src/hooks/useApi'
+import toast from 'react-hot-toast'
+
+// import RowOptions from 'src/views/apps/user/userManagement/list/RowOptions'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 
@@ -38,33 +41,26 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
 }))
 
 const renderClient = row => {
-  const name = `${row?.firstName} ${row?.lastName}`
-
-  return (
-    <CustomAvatar
-      skin='light'
-      color={row.avatarColor}
-      sx={{
-        mr: 2.5,
-        width: 38,
-        height: 38,
-        fontWeight: 500,
-        fontSize: theme => theme.typography.body1.fontSize
-      }}
-    >
-      {getInitials(name)}
-    </CustomAvatar>
-  )
+  if (row.imageUrl) {
+    return <CustomAvatar src={row.imageUrl} sx={{ mr: 2.5, width: 38, height: 38 }} />
+  } else {
+    return (
+      <CustomAvatar
+        skin='light'
+        sx={{ mr: 2.5, width: 38, height: 38, fontWeight: 500, fontSize: theme => theme.typography.body1.fontSize }}
+      >
+        {getInitials(row.firstName ? row.firstName : 'John Doe')}
+      </CustomAvatar>
+    )
+  }
 }
 
-const ViewUserModel = ({ row, datafetchuser }) => {
+const ViewUserModel = ({ row }) => {
   // ** State
   const [open, setOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
   const [deleteopen, setdeleteOpen] = useState(false)
   const handleClickdeleteOpen = () => setdeleteOpen(true)
   const handleClose = () => setdeleteOpen(false)
-  const [isLoading, setIsLoading] = useState(false)
 
   const { t } = useTranslation()
 
@@ -72,53 +68,31 @@ const ViewUserModel = ({ row, datafetchuser }) => {
     setOpen(!open)
   }
 
-  const toggleEditDrawer = () => {
-    setOpen(false)
+  // ! mutation
+  const queryClient = useQueryClient()
 
-    setEditOpen(!editOpen) // Toggle the Edit drawer
-  }
-
-  const handleDelete = async () => {
-    try {
-      const userToken = localStorage.getItem('token')
-
-      const headers = {
-        accept: 'application/json',
-        Authorization: `Bearer ${userToken}`
-      }
-
-      setIsLoading(true)
-
-      const response = await fetch(`${BASE_URL}users/${row.id}/admin.user.deleteuserasync`, {
-        method: 'POST',
-        headers: headers
-      })
-
-      const result = await response.json()
-
-      if (response?.ok) {
-        toast.success('Data deleted successfully')
-        handleClose()
-        datafetchuser()
-      } else {
-        toast.error(response?.messages)
-        setIsLoading(true)
-      }
-    } catch (error) {
-      toast.error(error)
-    } finally {
-      setIsLoading(false)
+  const mutation = useMutation({
+    mutationKey: ['deleteUser'],
+    mutationFn: id => api.post(`/users/user.deleteuserasync`, {}, { params: { id } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['users'])
+      toast.success('User Deleted')
+      handleClose()
+      handleClickOpen()
+    },
+    onError: errors => {
+      toast.error('Request Failed')
+      console.log(errors)
+      setdeleteOpen(false)
     }
-    handleClickOpen()
-    datafetchuser()
+  })
+
+  function handleDelete() {
+    mutation.mutate(row.id)
   }
 
   return (
     <>
-      {/* <Button>
-      {/* <Button>
-        <Icon color='primary' icon={'tabler:circle-plus'} fontSize={20} onClick={handleClickOpen} />
-      </Button> */}
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         {renderClient(row)}
         <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
@@ -127,12 +101,16 @@ const ViewUserModel = ({ row, datafetchuser }) => {
             onClick={handleClickOpen}
             sx={{
               fontWeight: 500,
+              cursor: 'pointer',
               textDecoration: 'none',
               color: 'text.secondary',
               '&:hover': { color: 'primary.main' }
             }}
           >
-            {`${row.firstName} ${row.lastName}`}
+            {row.firstName + ' ' + row.lastName}
+          </Typography>
+          <Typography noWrap variant='body2' sx={{ color: 'text.disabled' }}>
+            {row.email}
           </Typography>
         </Box>
       </Box>{' '}
@@ -140,6 +118,7 @@ const ViewUserModel = ({ row, datafetchuser }) => {
         open={open}
         onClose={handleClickOpen}
         aria-labelledby='customized-dialog-title'
+        className='cursor-pointer'
         sx={{
           '& .MuiDialog-paper': {
             overflow: 'visible'
@@ -201,7 +180,12 @@ const ViewUserModel = ({ row, datafetchuser }) => {
               <TableRow sx={{ '&:last-of-type .MuiTableCell-root ': { border: 0 } }}>
                 <TableCell>{t('Action')}</TableCell>
                 <TableCell>
-                  <Button onClick={toggleEditDrawer}>
+                  <Button
+                    onClick={() => {
+                      row.editFn(row)
+                      setOpen(false)
+                    }}
+                  >
                     <Icon icon='tabler:edit' fontSize={20} />
                   </Button>
                   <Button onClick={handleClickdeleteOpen}>
@@ -213,7 +197,6 @@ const ViewUserModel = ({ row, datafetchuser }) => {
           </Table>
         </TableContainer>
       </Dialog>
-      <AddUserDrawer open={editOpen} row={row} toggle={toggleEditDrawer} datafetchuser={datafetchuser} />
       <Dialog
         open={deleteopen}
         onClose={handleClose}
@@ -233,27 +216,13 @@ const ViewUserModel = ({ row, datafetchuser }) => {
             </span>
           </Typography>
         </DialogContent>
-        <DialogContent>
-          <Box sx={{ marginTop: '-30px', display: 'flex', justifyContent: 'center' }}>
-            <div style={{ height: '100px', width: '100px' }}>
-              <img
-                src='/images/icons/project-icons/trashimage.png'
-                alt='abc'
-                style={{
-                  height: '100%',
-                  width: '100%'
-                }}
-              />
-            </div>
-          </Box>
-        </DialogContent>
 
         <DialogActions sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          {isLoading ? (
+          {mutation.isPending ? (
             <CircularProgress />
           ) : (
             <>
-              <Button variant='contained' onClick={handleDelete}>
+              <Button variant='contained' onClick={() => handleDelete()}>
                 Yes
               </Button>
               <Button variant='contained' onClick={handleClose}>

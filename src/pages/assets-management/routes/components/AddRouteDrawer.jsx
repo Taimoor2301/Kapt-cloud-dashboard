@@ -51,6 +51,7 @@ const defaultValues = {
 
 const AddRouteDrawer = ({ open, toggle }) => {
   const queryClient = useQueryClient()
+
   const mutation = useMutation({
     mutationKey: ['addNewRoute'],
     mutationFn: data => api.post('/routes/route.createrouteasync', data),
@@ -86,6 +87,7 @@ const AddRouteDrawer = ({ open, toggle }) => {
   const [selectedColor, setSelectedColor] = useState('black')
   const [showColorPicker, setShowColorPicker] = useState(false)
   const { t } = useTranslation()
+
   const handleClose = () => {
     toggle()
     reset()
