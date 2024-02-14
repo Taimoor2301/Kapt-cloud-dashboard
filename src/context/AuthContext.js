@@ -101,8 +101,8 @@ const AuthProvider = ({ children }) => {
      localStorage.setItem('refreshToken',res.data.data.token.refreshToken);
      localStorage.setItem('userPermissions',JSON.stringify(res.data.data.permissions) );
      localStorage.setItem('userRoles',JSON.stringify(res.data.data.roles));
-     localStorage.setItem('userData', JSON.stringify({...res.data.data.user, role:res.data.data.roles[0].toLowerCase()}));
-     setUser({...res.data.data.user , role:res.data.data.roles[0].toLowerCase()});
+     localStorage.setItem('userData', JSON.stringify({...res.data.data.user, role:'admin'}));
+     setUser({...res.data.data.user , role:'admin'});
 
      const returnUrl = router.query.returnUrl
      const redirectURL = returnUrl && returnUrl !== '/dashboards' ? returnUrl : '/dashboards'
