@@ -16,6 +16,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 import InputAdornment from '@mui/material/InputAdornment'
 import MuiFormControlLabel from '@mui/material/FormControlLabel'
+import { useTranslation } from 'react-i18next'
 
 // ** Custom Component Import
 import CustomTextField from 'src/@core/components/mui/text-field'
@@ -41,6 +42,9 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
+import login from '../../assest/images/man_2.png'
+import logo from '../../assest/images/kaptlogo.svg'
+import Image from 'next/image'
 
 // ** Styled Components
 const LoginIllustration = styled('img')(({ theme }) => ({
@@ -94,7 +98,7 @@ const defaultValues = {
 const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
-
+  const { t } = useTranslation()
   // ** Hooks
   const auth = useAuth()
   const theme = useTheme()
@@ -131,25 +135,25 @@ const LoginPage = () => {
     <Box className='content-right' sx={{ backgroundColor: 'background.paper' }}>
       {!hidden ? (
         <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            position: 'relative',
-            alignItems: 'center',
-            borderRadius: '20px',
-            justifyContent: 'center',
-            backgroundColor: 'customColors.bodyBg',
-            margin: theme => theme.spacing(8, 0, 8, 8)
-          }}
-        >
-          <LoginIllustration alt='login-illustration' src={`/images/pages/${imageSource}-${theme.palette.mode}.png`} />
-          <FooterIllustrationsV2 />
-        </Box>
+        sx={{
+          flex: 1,
+          display: 'flex',
+          position: 'relative',
+          alignItems: 'center',
+          borderRadius: '20px',
+          justifyContent: 'center',
+          backgroundColor: 'customColors.bodyBg',
+          margin: theme => theme.spacing(5, 0, 5, 8)
+        }}
+      >
+        <Image src={login} style={{ height: '93vh', objectFit: 'contain', width: '50%' }} />
+        <FooterIllustrationsV2 />
+      </Box>
       ) : null}
       <RightWrapper>
-        <Box
+      <Box
           sx={{
-            p: [6, 12],
+            p: [5, 12],
             height: '100%',
             display: 'flex',
             alignItems: 'center',
@@ -157,18 +161,17 @@ const LoginPage = () => {
           }}
         >
           <Box sx={{ width: '100%', maxWidth: 400 }}>
-           <div className='max-w-20'>
-            <img src='/assets/images/kaptlogo.svg' alt='logo' className='max-w-full' />
-           </div>
-            <Box sx={{ my: 6 }}>
+            <Box sx={{ width: '100%', maxWidth: 400, textAlign: 'center' }}>
+              <Image src={logo} width={180} />
+            </Box>
+            <Box sx={{ mb: 2, mt: -6 }}>
               <Typography variant='h3' sx={{ mb: 1.5 }}>
-                {`Welcome to KaptCloud! 👋🏻`}
+                {t(`Welcome to ${themeConfig.templateName}! 👋🏻`)}
               </Typography>
               <Typography sx={{ color: 'text.secondary' }}>
-                Please sign-in to your account and start the adventure
+                {t('Please sign-in to your account and start the adventure')}
               </Typography>
             </Box>
-
             <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ mb: 4 }}>
                 <Controller
@@ -179,11 +182,11 @@ const LoginPage = () => {
                     <CustomTextField
                       fullWidth
                       autoFocus
-                      label='Email'
+                      label={t('Email')}
                       value={value}
                       onBlur={onBlur}
                       onChange={onChange}
-                      placeholder='example@email.com'
+                      placeholder='admin@vuexy.com'
                       error={Boolean(errors.email)}
                       {...(errors.email && { helperText: errors.email.message })}
                     />
@@ -200,7 +203,7 @@ const LoginPage = () => {
                       fullWidth
                       value={value}
                       onBlur={onBlur}
-                      label='Password'
+                      label={t('Password')}
                       onChange={onChange}
                       id='auth-login-v2-password'
                       error={Boolean(errors.password)}
@@ -233,50 +236,21 @@ const LoginPage = () => {
                 }}
               >
                 <FormControlLabel
-                  label='Remember Me'
+                  label={t('Remember Me')}
                   control={<Checkbox checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />}
                 />
                 <Typography component={LinkStyled} href='/forgot-password'>
-                  Forgot Password?
+                  {t('Forgot Password?')}
                 </Typography>
               </Box>
               <Button fullWidth type='submit' variant='contained' sx={{ mb: 4 }}>
-                Login
+                {t('Login')}
               </Button>
               <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <Typography sx={{ color: 'text.secondary', mr: 2 }}>New on our platform?</Typography>
+                <Typography sx={{ color: 'text.secondary', mr: 2 }}>{t('New on our platform?')}</Typography>
                 <Typography href='/register' component={LinkStyled}>
-                  Create an account
+                  {t('Create an account')}
                 </Typography>
-              </Box>
-              <Divider
-                sx={{
-                  color: 'text.disabled',
-                  '& .MuiDivider-wrapper': { px: 6 },
-                  fontSize: theme.typography.body2.fontSize,
-                  my: theme => `${theme.spacing(6)} !important`
-                }}
-              >
-                or
-              </Divider>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconButton href='/' component={Link} sx={{ color: '#497ce2' }} onClick={e => e.preventDefault()}>
-                  <Icon icon='mdi:facebook' />
-                </IconButton>
-                <IconButton href='/' component={Link} sx={{ color: '#1da1f2' }} onClick={e => e.preventDefault()}>
-                  <Icon icon='mdi:twitter' />
-                </IconButton>
-                <IconButton
-                  href='/'
-                  component={Link}
-                  onClick={e => e.preventDefault()}
-                  sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : 'grey.300') }}
-                >
-                  <Icon icon='mdi:github' />
-                </IconButton>
-                <IconButton href='/' component={Link} sx={{ color: '#db4437' }} onClick={e => e.preventDefault()}>
-                  <Icon icon='mdi:google' />
-                </IconButton>
               </Box>
             </form>
           </Box>
